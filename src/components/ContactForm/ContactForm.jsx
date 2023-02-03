@@ -1,9 +1,9 @@
 import PropTypes from 'prop-types';
 import { Formik, Field, Form } from 'formik';
-import { Component } from 'react';
 import styled from 'styled-components';
 
 import {FormWrapper, Button} from './ContactForm.styled'
+import { useState } from 'react';
 
 const Input = styled(Field)`
     width: 250px;
@@ -17,36 +17,40 @@ gap: 20px;
 justify-content: space-between;
 `;
 
-export class ContactForm extends Component {
-    static propTypes = {
-    onSubmit: PropTypes.func.isRequired,
-}
-
-    state = {
-            name: '',
-            number: ''
-    }
+export const ContactForm = ({onSubmit}) => {
+    const [name, setName] = useState('');
+    const [number, setNumber] = useState('');
     
-    handleInputChange = evt => {
-        this.setState({[evt.currentTarget.name]: evt.currentTarget.value})
+    const handleInputChange = evt => {
+        console.log(evt.currentTarget.name);
+        switch (evt.currentTarget.name) {
+            case "name":
+                setName(evt.currentTarget.value);
+                break;
+            case "number":
+                setNumber(evt.currentTarget.value);
+                break;
+            default:
+                return;
+        }
     }
 
-    handleSubmit = evt => {
+    const handleSubmit = evt => {
         // evt.preventDefault();
-        this.props.onSubmit(this.state);
-        this.resetForm();
+        onSubmit({name, number});
+        resetForm();
     }
 
-    resetForm = () => {
-        this.setState({ name: '', number: '' });
+    const resetForm = () => {
+        setName('');
+        setNumber('');
     }
 
-    render() {
     return (
       <FormWrapper>
         <Formik
         initialValues={{name: '', number: ''}}
-      onSubmit={this.handleSubmit}
+      onSubmit={handleSubmit}
     >
       <FormWithStyle autoComplete = "off">
             <label htmlFor="name">
@@ -57,7 +61,7 @@ export class ContactForm extends Component {
                     name="name"
                     type="text"
                     pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
-                    value={this.state.name} onChange={this.handleInputChange} />
+                    value={name} onChange={handleInputChange} />
 
             <label htmlFor="number">
                 Contacts
@@ -67,13 +71,15 @@ export class ContactForm extends Component {
                     name="number"
                     type="tel"
                     pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
-                    value={this.state.number} onChange={this.handleInputChange} />
+                    value={number} onChange={handleInputChange} />
 
         <Button type="submit" >Add contact</Button>
       </FormWithStyle>
             </Formik>
             </FormWrapper>
     )
-  }
+}
 
+    ContactForm.propTypes = {
+    onSubmit: PropTypes.func.isRequired,
 }
